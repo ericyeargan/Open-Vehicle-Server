@@ -1,0 +1,31 @@
+version: '3'
+services:
+  ovms-server:
+    image: "ovms-server:latest"
+    depends_on:
+      mysql:
+        condition: service_healthy     
+    networks:
+      - backend
+    volumes:
+      - "./server/conf:/server/conf"
+    ports:
+      - "6868:6868"
+  mysql:
+    image: "mysql:8.0"
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "openvehicles"
+      MYSQL_USER: "ovms"
+      MYSQL_PASSWORD: "ovms"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+networks:
+  backend:
+
